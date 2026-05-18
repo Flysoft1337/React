@@ -1,30 +1,49 @@
-# React Assignments
+# React 演示 - 5.18
 
-React 练习项目合集，每个分支对应一次独立的练习。
+两个小演示：
 
-## 技术栈
+- **useLayoutEffect vs useEffect** —— 对比执行时机，观察闪烁
+- **array & Object 不可变更新** —— `push` / 直接改字段为什么不触发渲染
 
-- React 19
-- TypeScript
-- Vite
-- react-router v7
-
-## 分支说明
-
-| 日期 | 分支 | 内容 | 核心知识点 |
-| --- | --- | --- | --- |
-| 2026-04-27 | [react-router-assignment](../../tree/2026-04-27-react-router-assignment) | React Router 路由演示 | 二级路由、路由守卫、路由监听、独立路由配置、Token 鉴权 |
-
-## 使用方式
+## 启动
 
 ```bash
-# 克隆仓库
-git clone https://github.com/Flysoft1337/react-assignments.git
-
-# 切换到对应分支
-git checkout 2026-04-27-react-router-assignment
-
-# 安装依赖并启动
 npm install
 npm run dev
+```
+
+## 目录
+
+```
+src/
+  App.tsx              顶部 tab 切换
+  demos/
+    EffectDemo.tsx     两个 hook 的时机对比
+    StateDemo.tsx      数组、对象的更新写法
+```
+
+## 要点
+
+### useLayoutEffect vs useEffect
+
+```
+DOM 提交 → useLayoutEffect（同步）→ 浏览器绘制 → useEffect（异步）
+```
+
+`useEffect` 在绘制后才跑，如果在里面同步改 state，用户会先看到旧画面再看到新画面，可能闪烁。`useLayoutEffect` 在绘制前同步执行，没有这个问题。读 DOM 尺寸、做布局修正用 `useLayoutEffect`。
+
+### array & Object
+
+React 用 `Object.is` 比较新旧 state，引用没变就跳过渲染。
+
+```ts
+// 错：引用没变
+list.push(x)
+setList(list)
+
+// 对：新数组
+setList([...list, x])
+
+// 嵌套对象要逐层展开
+setUser({ ...user, addr: { ...user.addr, city: '上海' } })
 ```
